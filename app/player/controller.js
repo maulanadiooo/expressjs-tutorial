@@ -30,7 +30,8 @@ module.exports = {
   detailPage: async (req, res) => {
     try {
       const { id } = req.params;
-      const voucher = await Voucher.findOne({ _id: id })
+      const payments = await Payment.find({}).populate("banks");
+      let voucher = await Voucher.findOne({ _id: id })
         // .select("_id status name category thumbnail")
         .populate("category")
         .populate("nominals")
@@ -44,7 +45,10 @@ module.exports = {
         res.status(200).json({
           status: true,
           message: "success",
-          data: voucher,
+          data: {
+            voucher,
+            payments,
+          },
         });
       }
     } catch (err) {
@@ -340,7 +344,8 @@ module.exports = {
             {
               ...payload,
               avatar: fileName,
-            }, { new: true, runValidators: true }
+            },
+            { new: true, runValidators: true }
           );
           res.status(201).json({
             status: true,
